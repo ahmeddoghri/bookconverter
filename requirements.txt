@@ -1,0 +1,12 @@
+# This project does not have direct Python package dependencies installable via pip
+# for its core functionality.
+
+# However, it relies on the Calibre command-line tool `ebook-convert`.
+# Please ensure Calibre is installed on your system.
+# Download Calibre: https://calibre-ebook.com/download
+
+# If you were to add Python libraries later, you would list them here, e.g.:
+# some_python_library>=1.0.0 
+
+Flask>=2.0.0
+Werkzeug>=2.0.0 

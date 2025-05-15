@@ -1,0 +1,209 @@
+/* Bookish Theme CSS */
+body {
+    font-family: 'Lato', Arial, sans-serif;
+    margin: 0;
+    padding: 40px 20px; /* Increased padding */
+    background-color: #fdfaf6; /* Creamy off-white background */
+    color: #4a3f35; /* Dark brown text */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+.container {
+    background-color: #fffefa; /* Slightly lighter cream for the container */
+    padding: 30px 40px; /* Increased padding */
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15); /* Softer, more pronounced shadow */
+    width: 100%;
+    max-width: 700px; /* Slightly wider */
+    border: 1px solid #e0dcd1; /* Subtle border */
+}
+
+h1 {
+    font-family: 'Merriweather', serif;
+    text-align: center;
+    color: #5c4033; /* Muted dark brown for heading */
+    margin-bottom: 30px; /* Increased margin */
+    font-size: 2.2em; /* Larger heading */
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    font-family: 'Merriweather', serif;
+    color: #6a5546;
+}
+
+.form-group select,
+.form-group input[type="file"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d3c9b8; /* Tan border */
+    border-radius: 6px;
+    box-sizing: border-box;
+    background-color: #fff;
+    font-family: 'Lato', sans-serif;
+    font-size: 1em;
+    color: #4a3f35;
+}
+
+.form-group input[type="file"]::file-selector-button {
+    font-family: 'Lato', sans-serif;
+    padding: 10px 15px;
+    margin-right: 10px;
+    background-color: #8b735b; /* Muted brown button */
+    color: #fffefa;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.form-group input[type="file"]::file-selector-button:hover {
+    background-color: #79614c;
+}
+
+button[type="submit"] {
+    font-family: 'Merriweather', serif;
+    background-color: #7a5c58; /* Muted reddish-brown */
+    color: #fffefa;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1em;
+    width: 100%;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+button[type="submit"]:hover {
+    background-color: #684b47;
+    transform: translateY(-1px);
+}
+
+button[type="submit"]:active {
+    transform: translateY(0px);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+
+#status {
+    margin-top: 25px;
+    padding: 15px;
+    border-radius: 6px;
+    font-size: 1.05em;
+}
+
+#status.processing {
+    background-color: #e8f0fe; /* Light blue for processing */
+    border: 1px solid #c3d7fb;
+    color: #3e5a8a;
+}
+
+#status.error {
+    background-color: #ffebee; /* Light red for error */
+    border: 1px solid #ffcdd2;
+    color: #c62828; 
+}
+
+#results {
+    margin-top: 25px;
+}
+
+#results h2 {
+    font-family: 'Merriweather', serif;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    font-size: 1.6em;
+    color: #5c4033;
+    border-bottom: 1px solid #e0dcd1;
+    padding-bottom: 10px;
+}
+
+#results ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#results li {
+    background-color: #fdfaf6; /* Slightly off-white for list items */
+    border: 1px solid #e0dcd1;
+    padding: 15px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+#results li .filename {
+    font-weight: normal; /* Regular weight is fine with Lato */
+    flex-grow: 1;
+    overflow-wrap: break-word;
+    word-break: break-all;
+    min-width: 0;
+    color: #4a3f35;
+}
+
+#results li .filename strong {
+    font-family: 'Merriweather', serif;
+    color: #5c4033;
+}
+
+#results li a.download-link {
+    font-family: 'Lato', sans-serif;
+    display: inline-block;
+    background-color: #8b735b; /* Muted brown, same as file input button */
+    color: #fffefa;
+    padding: 10px 18px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 0.95em;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    flex-shrink: 0;
+    text-align: center;
+}
+
+#results li a.download-link:hover {
+    background-color: #79614c;
+    transform: translateY(-1px);
+}
+
+#results .zip-download {
+    margin-top: 25px;
+    text-align: center;
+}
+
+#results .zip-download a {
+    font-family: 'Merriweather', serif;
+    background-color: #a88b60; /* Golden tan for zip download */
+    color: #fffefa;
+    padding: 12px 25px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+    display: inline-block;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#results .zip-download a:hover {
+    background-color: #967850;
+    transform: translateY(-1px);
+}
+
+.error-message {
+    font-family: 'Lato', sans-serif;
+    color: #c62828; /* Match error status color */
+    font-weight: bold;
+} 

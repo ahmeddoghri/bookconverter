@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-book Converter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>E-book Converter</h1>
+        
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="source_format">Source Format:</label>
+                <select id="source_format" name="source_format">
+                    <option value="epub">EPUB</option>
+                    <option value="mobi">MOBI</option>
+                    <option value="pdf">PDF</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="target_format">Target Format:</label>
+                <select id="target_format" name="target_format">
+                    <option value="pdf">PDF</option>
+                    <option value="epub">EPUB</option>
+                    <option value="mobi">MOBI</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="files">Select Files (Max 30MB total):</label>
+                <input type="file" id="files" name="files[]" multiple accept=".pdf,.epub,.mobi">
+            </div>
+            
+            <button type="submit">Convert</button>
+        </form>
+        
+        <div id="status">
+            <!-- Progress and messages will appear here -->
+        </div>
+        
+        <div id="results">
+            <!-- Download links will appear here -->
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html> 
