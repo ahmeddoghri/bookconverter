@@ -1,6 +1,6 @@
 # Full-Stack E-book Converter Web App
 
-![Screenshot of E-book Converter](placeholder_screenshot.png) <!-- Optional: Add a screenshot later -->
+![Screenshot of E-book Converter](static/bookconverter.png)
 
 This web application provides a user-friendly interface to upload e-book files (EPUB, MOBI, PDF), convert them to a selected target format, and download the results. It features a stylish, "bookish" theme for a pleasant user experience.
 
