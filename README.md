@@ -1,23 +1,23 @@
-# Full-Stack E-book Converter Web App
+# E-book Converter
 
 ![Screenshot of E-book Converter](static/bookconverter.png)
 
-This web application provides a user-friendly interface to upload e-book files (EPUB, MOBI, PDF), convert them to a selected target format, and download the results. It features a stylish, "bookish" theme for a pleasant user experience.
+I needed to turn a stack of EPUBs into MOBI for my Kindle and PDF for an AI reading assistant. Every "free" online converter I tried had a file limit, a queue, or a very well-hidden subscription. So I built this instead: a local Flask app with a "bookish" theme that converts EPUB, MOBI, and PDF, on my machine, for free, without asking what I'm reading.
 
-## Key Features
+## What it does
 
-*   **Intuitive Web Interface:** Modern, clean, and "bookish" themed UI.
-*   **Format Selection:** Supports PDF, EPUB, and MOBI as source and target formats.
-*   **File Upload:** 
-    *   Allows selection of one or multiple files.
-    *   Client-side validation to ensure selected files match the chosen source format.
-    *   Configurable maximum upload size (default: 30MB per request).
-*   **Conversion Engine:** Utilizes Calibre's powerful `ebook-convert` command-line tool for reliable conversions.
-*   **Output Management:**
-    *   **Individual Downloads:** Direct download links for each successfully converted file.
-    *   **Batch Downloads:** Bundles multiple converted files into a single ZIP archive named `converted_files.zip` (or `converted_files (n).zip` for duplicates).
-*   **Status & Error Reporting:** Clear feedback on conversion progress, success, and any errors encountered.
-*   **Session-Based File Handling:** Uploaded and converted files are managed in session-specific temporary directories.
+*   **A UI that doesn't look like a spreadsheet:** clean, "bookish" theme, because this converts books.
+*   **PDF, EPUB, and MOBI**, any format to any other format.
+*   **File upload that respects your time:**
+    *   Select one file or fifty.
+    *   Client-side validation catches a mismatched format before you waste a conversion attempt.
+    *   Configurable upload cap (default 30MB per request).
+*   **The actual conversion engine is Calibre's `ebook-convert`**, because Calibre has been solving this exact problem for over a decade and reinventing it would just be ego.
+*   **Downloads that make sense:**
+    *   Convert one file, get one download link.
+    *   Convert a batch, get one ZIP (`converted_files.zip`, or `converted_files (n).zip` if you run it twice).
+*   **Real error messages**, not a spinner that dies silently.
+*   **Session-scoped file handling:** your uploads and outputs live in a session-specific temp folder, not a shared bucket with everyone else's books.
 
 ## Technology Stack
 
@@ -122,26 +122,23 @@ This web application provides a user-friendly interface to upload e-book files (
     └── converted_files (n).zip # ZIP archives for batch downloads
 ```
 
-## Important Considerations & Limitations
+## The honest limitations
 
-*   **`ebook-convert` Dependency:** The application is fundamentally dependent on Calibre's `ebook-convert` tool. If it's not installed correctly or not found in the system PATH (or common alternative paths checked by the script), conversions will fail.
-*   **Temporary File Management & Cleanup:** 
-    *   Uploaded files are stored temporarily in `uploads/<session_id>/`.
-    *   Converted files are stored in `converted_files/<session_id>/`.
-    *   ZIP archives are stored directly in the `converted_files/` directory.
-    *   **CRITICAL: This application, in its current state, does NOT implement automatic cleanup of these session-specific folders or the generated ZIP files.** Over time, these folders and files will accumulate and consume disk space. For a production or long-term deployment, a robust cleanup mechanism (e.g., a scheduled background job or manual periodic cleanup) is essential.
-*   **File Size Limit:** The Flask application has a default maximum content length for uploads set to 30MB per request (see `app.config['MAX_CONTENT_LENGTH']` in `app.py`). This can be adjusted if needed.
-*   **Error Handling:** The application provides basic error feedback to the user. Server-side logs (console output) will contain more detailed error messages from `ebook-convert` if issues occur.
-*   **Development Server:** The application uses Flask's built-in development server (`app.run(debug=True)`). **This server is NOT suitable for production use.** For a production environment, deploy the application using a production-ready WSGI server (e.g., Gunicorn, uWSGI) typically behind a reverse proxy (e.g., Nginx).
-*   **Security:** Basic security measures like `secure_filename` are used. For public-facing applications, further security hardening (e.g., input validation, rate limiting, CSRF protection if forms become more complex) would be necessary.
-*   **Scalability:** This is a simple, single-process Flask application. For handling high traffic or a large number of concurrent conversions, a more scalable architecture would be required (e.g., using asynchronous task queues like Celery for conversions, multiple WSGI server workers).
+This is a tool I run on my own laptop, not a startup, so here's what it doesn't do:
+
+*   **It needs Calibre.** No `ebook-convert` in your PATH means no conversions. That's the whole engine.
+*   **It doesn't clean up after itself.** Uploaded and converted files sit in `uploads/<session_id>/` and `converted_files/<session_id>/` forever. Fine for personal use, a real problem if you leave this running on a shared server for months. Add a cron job or wipe the folders yourself.
+*   **30MB upload cap by default.** Change `app.config['MAX_CONTENT_LENGTH']` in `app.py` if your books are chunkier than that.
+*   **This is Flask's dev server**, not something you point the public internet at. Put Gunicorn or uWSGI behind it if you're actually deploying this somewhere.
+*   **Basic security only.** `secure_filename` is in there, nothing more. Don't expose this to strangers without adding real input validation and rate limiting first.
+*   **Single process.** It converts your books, not everyone's books at once. If you need that, you're building a different, more annoying product.
 
 ## Customization
 
-*   **File Size Limit:** Modify `app.config['MAX_CONTENT_LENGTH']` in `app.py`.
-*   **Styling:** Update `static/style.css` and `templates/index.html` for UI changes.
-*   **`ebook-convert` Path:** If `ebook-convert` is in a very non-standard location, you might need to adjust the `find_ebook_convert_path` function in `book_converter_utils.py`.
+*   **File size limit:** `app.config['MAX_CONTENT_LENGTH']` in `app.py`.
+*   **Styling:** `static/style.css` and `templates/index.html`.
+*   **Non-standard `ebook-convert` location:** adjust `find_ebook_convert_path` in `book_converter_utils.py`.
 
 ## License
 
-This project is open-source. (You can add a specific license if you wish, e.g., MIT). 
+MIT. See LICENSE.
