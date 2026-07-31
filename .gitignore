@@ -139,3 +139,8 @@ ehthumbs.db
 
 # If you have a specific Calibre library folder within the project (not recommended)
 # /Calibre Library/
+# Virtualenv and build artifacts
+.venv/
+*.egg-info/
+uploads/
+converted_files/

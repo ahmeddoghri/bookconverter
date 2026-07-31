@@ -1,12 +1,11 @@
-# This project does not have direct Python package dependencies installable via pip
-# for its core functionality.
-
-# However, it relies on the Calibre command-line tool `ebook-convert`.
-# Please ensure Calibre is installed on your system.
-# Download Calibre: https://calibre-ebook.com/download
-
-# If you were to add Python libraries later, you would list them here, e.g.:
-# some_python_library>=1.0.0 
-
+# The web app.
 Flask>=2.0.0
-Werkzeug>=2.0.0 
+Werkzeug>=2.0.0
+
+# Fidelity checking. EPUB and MOBI are read with the standard library; pypdf is
+# needed only to look inside PDFs. Without it, PDF outputs are still converted,
+# just reported as unchecked rather than guessed at.
+pypdf>=4.0.0
+
+# Conversion itself is Calibre's `ebook-convert`, a system binary rather than a
+# Python package: https://calibre-ebook.com/download

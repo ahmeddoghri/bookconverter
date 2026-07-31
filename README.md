@@ -6,6 +6,7 @@ I needed to turn a stack of EPUBs into MOBI for my Kindle and PDF for an AI read
 
 ## What it does
 
+*   **Fidelity checking, which is the part nobody else does:** after each conversion it opens the output and compares it to the source. Chapters, word count, images, title, author.
 *   **A UI that doesn't look like a spreadsheet:** clean, "bookish" theme, because this converts books.
 *   **PDF, EPUB, and MOBI**, any format to any other format.
 *   **File upload that respects your time:**
@@ -19,9 +20,116 @@ I needed to turn a stack of EPUBs into MOBI for my Kindle and PDF for an AI read
 *   **Real error messages**, not a spinner that dies silently.
 *   **Session-scoped file handling:** your uploads and outputs live in a session-specific temp folder, not a shared bucket with everyone else's books.
 
+## Exit code 0 is not the same as "the book survived"
+
+Calibre is good. It is genuinely one of the better pieces of open-source
+software, and this project does not try to replace it. But `ebook-convert`
+returning 0 means one thing: the process did not crash. It does not mean the
+table of contents came through, the author's name is still attached, or chapter
+12 is where you left it.
+
+You find that out later, on a device, halfway through a book.
+
+So every conversion now gets checked. The `bookcheck` package reads both files
+and compares them:
+
+```bash
+bookcheck convert library/*.epub -t mobi --out kindle/
+```
+
+```
+ok    Dune.epub -> Dune.mobi                fidelity 100/100
+ok    Neuromancer.epub -> Neuromancer.mobi  fidelity 100/100
+WARN  Anathem.epub -> Anathem.mobi          fidelity 88/100
+        [warning] toc_lost: The table of contents did not survive conversion
+
+1 file(s) converted but lost something worth checking.
+```
+
+All three "succeeded". Only one of them needs your attention, and you know which
+one before you load it onto a device.
+
+### How it reads each format
+
+Nothing shells out to Calibre to inspect a file. EPUB is a ZIP of XHTML, read
+with `zipfile`. MOBI and AZW3 are PalmDB containers whose headers are parsed
+directly, including the EXTH block where the author lives. PDF goes through
+`pypdf` when it is installed. That means a discrepancy can be explained in terms
+of what is actually inside the file.
+
+Anything a format won't reveal is reported as unavailable rather than guessed.
+MOBI text is compressed, so its word count is not recoverable without a full
+decompressor, and the verifier **skips** that comparison instead of inventing a
+discrepancy. A check that fires on a file it cannot read is worse than no check.
+
+### What it catches
+
+| Finding | What you lost |
+| --- | --- |
+| `text_lost` | A meaningful fraction of the words are gone |
+| `toc_lost` | The navigable table of contents did not survive |
+| `toc_reduced` | Most chapter entries disappeared |
+| `title_lost` / `author_lost` | Metadata dropped in conversion |
+| `images_lost` / `images_reduced` | Figures missing from the output |
+| `empty_output` | The file converted to nothing |
+
+Losing a TOC on the way into a PDF is graded `info`, not `warning`, because PDF
+has no reflowable navigation. That is the format's nature, not a defect worth
+alarming anyone about.
+
+### The subtle one
+
+The first version of this scored a book that had lost its entire table of
+contents at a perfect 100. The inspector falls back to counting headings when
+there is no TOC, so the chapter count matched on both sides and nothing looked
+wrong.
+
+"Eight entries in a declared TOC" and "eight headings and no TOC at all" are
+different claims, and collapsing them into one integer hid exactly the loss this
+tool exists to catch. Tracking TOC presence separately from chapter count fixed
+it. That is now its own test.
+
+### Verified against known damage
+
+Fixtures are generated from code with exactly known structure, so the inspector
+is checked against ground truth rather than against itself. Then books are
+damaged in one specific way each, and the verifier has to notice:
+
+| Damage | Detected | Score |
+| --- | :---: | ---: |
+| nothing (control) | no finding | 100 |
+| table of contents removed | `toc_lost` | 88 |
+| author removed | `author_lost` | 88 |
+| title removed | `title_lost` | 88 |
+| images removed | `images_lost` | 88 |
+| 6 of 8 chapters dropped | `text_lost`, `toc_reduced` | 48 |
+
+Six for six, and the control fires nothing. Real EPUB to PDF, MOBI, AZW3, and
+EPUB conversions through Calibre all score 100, which is the regression that
+matters: a checker that cries wolf on good conversions gets switched off.
+
+### On its own
+
+```bash
+bookcheck inspect book.epub              # what's actually in there
+bookcheck verify book.epub book.pdf      # what changed
+bookcheck convert book.epub -t pdf --min-fidelity 90   # non-zero exit below the bar
+```
+
+EPUB and MOBI checking uses only the standard library, so `bookcheck verify`
+works with nothing installed at all. A separate CI job proves it.
+
+### Limits
+
+*   **Structural, not visual.** It counts words, chapters, and images. It cannot tell you the font rendered badly or a table looks wrong.
+*   **MOBI and AZW3 word counts are unavailable** because the text is compressed. Those comparisons are skipped, not estimated.
+*   **PDF inspection needs `pypdf`.** Without it, PDF outputs convert fine but are reported as unchecked.
+*   **A fidelity score of 100 is not proof of a perfect conversion**, only that nothing this can measure went missing.
+
 ## Technology Stack
 
 *   **Backend:** Python, Flask
+*   **Fidelity checking:** `bookcheck` (stdlib `zipfile`/`struct` for EPUB and MOBI, `pypdf` for PDF)
 *   **Conversion:** Calibre (`ebook-convert` command-line tool)
 *   **Frontend:** HTML, CSS, JavaScript
 *   **Fonts:** Google Fonts (Merriweather for headings, Lato for body text)

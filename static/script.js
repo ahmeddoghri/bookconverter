@@ -112,8 +112,26 @@ document.addEventListener('DOMContentLoaded', function () {
             if (data.processed_files && data.processed_files.length > 0) {
                 let filesHtml = '<h2>Converted Files:</h2><ul>';
                 data.processed_files.forEach(file => {
+                    // The fidelity badge answers the question the exit code
+                    // cannot: did the book actually survive the conversion?
+                    let fidelityHtml = '';
+                    if (typeof file.fidelity_score === 'number') {
+                        const state = file.fidelity_ok ? 'good' : 'warn';
+                        fidelityHtml = `<span class="fidelity fidelity--${state}"
+                                              title="Structural comparison against the source book">
+                                            fidelity ${file.fidelity_score}/100
+                                        </span>`;
+                        if (file.fidelity_findings && file.fidelity_findings.length > 0) {
+                            fidelityHtml += '<ul class="fidelity-findings">' +
+                                file.fidelity_findings
+                                    .map(f => `<li>${f.message}</li>`)
+                                    .join('') +
+                                '</ul>';
+                        }
+                    }
                     filesHtml += `<li>
                                      <span class="filename">${file.original_name} &rarr; ${file.converted_name}</span>
+                                     ${fidelityHtml}
                                      <a href="${file.download_url}" class="download-link" download>Download</a>
                                  </li>`;
                 });

@@ -207,3 +207,32 @@ button[type="submit"]:active {
     color: #c62828; /* Match error status color */
     font-weight: bold;
 } 
+/* Fidelity badge: what the exit code cannot tell you. */
+.fidelity {
+    display: inline-block;
+    margin: 0 0.6em;
+    padding: 0.15em 0.6em;
+    border-radius: 999px;
+    font-size: 0.8em;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.fidelity--good {
+    background: #e3f2e6;
+    color: #256b32;
+}
+
+.fidelity--warn {
+    background: #fdf1dc;
+    color: #8a5a12;
+}
+
+.fidelity-findings {
+    margin: 0.35em 0 0.2em 1.2em;
+    padding: 0;
+    font-size: 0.85em;
+    color: #8a5a12;
+    list-style: disc;
+}

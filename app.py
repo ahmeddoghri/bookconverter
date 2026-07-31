@@ -8,6 +8,7 @@ from werkzeug.utils import secure_filename
 
 # Assuming book_converter_utils.py will be created in the same directory
 import book_converter_utils as bcu
+from bookcheck import verify as bookcheck_verify
 
 app = Flask(__name__)
 
@@ -33,6 +34,33 @@ def allowed_file(filename, selected_source_format):
         return False
     ext = filename.rsplit('.', 1)[1].lower()
     return ext in ALLOWED_EXTENSIONS and ext == selected_source_format.lower()
+
+
+def describe_fidelity(source_path, output_path):
+    """Compare the converted file against its source and summarize the result.
+
+    A conversion that exits 0 can still have dropped the table of contents or
+    the author's name. This attaches that answer to each converted file so the
+    user sees it before they load the book onto a device and find out later.
+
+    Never raises: a fidelity check that fails is a missing opinion, not a
+    failed conversion, and must not cost the user their file.
+    """
+    try:
+        report = bookcheck_verify(source_path, output_path)
+    except Exception as exc:  # noqa: BLE001
+        app.logger.info("Fidelity check skipped for %s: %s", output_path, exc)
+        return {'fidelity_score': None, 'fidelity_findings': []}
+
+    return {
+        'fidelity_score': report.score,
+        'fidelity_ok': report.ok,
+        'fidelity_findings': [
+            {'severity': f.severity, 'message': f.message}
+            for f in report.findings
+            if f.severity in ('critical', 'warning')
+        ],
+    }
 
 @app.route('/')
 def index():
@@ -103,11 +131,13 @@ def upload_files():
                     base_name # pass base_name to convert_file_web
                 )
                 if success and result_path_or_msg:
-                    processed_files.append({
+                    entry = {
                         'original_name': original_filename,
                         'converted_name': os.path.basename(result_path_or_msg),
                         'download_url': url_for('download_file', session_id=conversion_session_id, filename=os.path.basename(result_path_or_msg))
-                    })
+                    }
+                    entry.update(describe_fidelity(uploaded_filepath, result_path_or_msg))
+                    processed_files.append(entry)
                 else:
                     errors.append(f"Error converting {original_filename}: {result_path_or_msg}")
         elif file.filename: # If a file was selected but not allowed

@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bookconverter"
+version = "1.1.0"
+description = "Convert e-books with Calibre, then verify the book actually survived"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+authors = [{ name = "Ahmed Doghri" }]
+keywords = ["ebook", "epub", "mobi", "pdf", "calibre", "conversion", "fidelity"]
+
+# EPUB and MOBI inspection uses only the standard library, so the fidelity
+# checks have no required dependencies at all.
+dependencies = []
+
+[project.optional-dependencies]
+pdf = ["pypdf>=4.0.0"]
+web = ["Flask>=2.0.0", "Werkzeug>=2.0.0", "pypdf>=4.0.0"]
+dev = ["pytest>=8.0", "pypdf>=4.0.0", "Flask>=2.0.0"]
+
+[project.scripts]
+bookcheck = "bookcheck.cli:main"
+
+[tool.setuptools]
+packages = ["bookcheck"]
+
+[tool.pytest.ini_options]
+pythonpath = "."
+testpaths = ["tests"]
+python_files = ["test_*.py"]
