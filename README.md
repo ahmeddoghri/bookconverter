@@ -1,5 +1,7 @@
 # E-book Converter
 
+[![tests](https://github.com/ahmeddoghri/bookconverter/actions/workflows/tests.yml/badge.svg)](https://github.com/ahmeddoghri/bookconverter/actions/workflows/tests.yml) [![case study](https://img.shields.io/badge/case%20study-adoghri.com-e0703e)](https://adoghri.com/project-3.html)
+
 ![Screenshot of E-book Converter](static/bookconverter.png)
 
 I needed to turn a stack of EPUBs into MOBI for my Kindle and PDF for an AI reading assistant. Every "free" online converter I tried had a file limit, a queue, or a very well-hidden subscription. So I built this instead: a local Flask app with a "bookish" theme that converts EPUB, MOBI, and PDF, on my machine, for free, without asking what I'm reading.
