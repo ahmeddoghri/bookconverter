@@ -83,14 +83,15 @@ def convert(
     import time
 
     source_path, output_path = Path(source), Path(output)
+    # A missing input is the user's first problem; don't send them off to install Calibre for a typo.
+    if not source_path.exists():
+        return ConversionResult(source_path, None, False, f"{source_path} does not exist")
     binary = ebook_convert or find_ebook_convert()
     if not binary:
         return ConversionResult(
             source_path, None, False,
             "ebook-convert not found. Install Calibre and put it on your PATH.",
         )
-    if not source_path.exists():
-        return ConversionResult(source_path, None, False, f"{source_path} does not exist")
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     started = time.monotonic()
