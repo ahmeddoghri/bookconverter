@@ -12,21 +12,45 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        python: ['3.11', '3.13']
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Calibre (for the real end-to-end conversion tests)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends calibre || echo "Calibre unavailable; conversion tests will skip"
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest
+      - name: Run tests
+        run: pytest -q
+
+  inspector-only:
+    # EPUB and MOBI inspection uses only the standard library. This job proves
+    # the fidelity checks still work with no pypdf and no Calibre installed.
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python }}
-      - name: Install
+          python-version: "3.13"
+      - name: Verify with nothing installed
         run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev]" || pip install -e .
-          pip install -r requirements.txt
-          pip install pytest
-      - name: Test
-        run: python -m pytest -q
+          python -c "
+          from bookcheck.fixtures import build_epub
+          from bookcheck import verify
+          build_epub('/tmp/a.epub', chapters=6, images=2)
+          build_epub('/tmp/b.epub', chapters=6, images=0, author=None)
+          clean = verify('/tmp/a.epub', '/tmp/a.epub')
+          damaged = verify('/tmp/a.epub', '/tmp/b.epub')
+          assert clean.score == 100, clean.score
+          assert damaged.score < 100, 'lost author and images went undetected'
+          print('clean', clean.score, 'damaged', damaged.score)
+          "
+          python -m bookcheck.cli inspect /tmp/a.epub

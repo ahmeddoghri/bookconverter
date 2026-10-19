@@ -105,6 +105,7 @@ damaged in one specific way each, and the verifier has to notice:
 | title removed | `title_lost` | 88 |
 | images removed | `images_lost` | 88 |
 | 6 of 8 chapters dropped | `text_lost`, `toc_reduced` | 48 |
+| output file is zero bytes | `empty_output` | 60 |
 
 Six for six, and the control fires nothing. Real EPUB to PDF, MOBI, AZW3, and
 EPUB conversions through Calibre all score 100, which is the regression that
